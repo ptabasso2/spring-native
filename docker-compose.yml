@@ -1,0 +1,48 @@
+version: '3.5'
+
+services:
+  dd-agent:
+    container_name: dd-agent
+    image: gcr.io/datadoghq/agent:latest-jmx
+    environment:
+      - DD_HOSTNAME=datadog
+      - DD_API_KEY
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC="true"
+      - DD_LOG_LEVEL=debug
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_CONTAINER_EXCLUDE_LOGS="name:datadog-agent"
+      - SD_JMX_ENABLE=true
+    ports:
+      - "8125:8125"
+      - "8126:8126"
+    volumes:
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app
+
+  springnative:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springnative
+    hostname: springnative
+    environment:
+      - DD_AGENT_HOST=dd-agent
+      - DD_SERVICE=springnative
+      - DD_ENV=dev
+      - DD_VERSION=1.2
+    ports:
+      - "8080:8080"
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
+    name: app
