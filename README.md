@@ -3,7 +3,11 @@
 
 ## 1. Introduction
 
-This project demonstrates a basic Spring Boot application configured to build and run as a native image using GraalVM. The application includes a `PerfController` that exposes endpoints to simulate CPU and memory-intensive operations, enabling performance profiling and monitoring through Datadog’s continuous profiling tools. The primary goal of this project is to create a highly optimized executable capable of leveraging GraalVM's native image capabilities for improved startup time and reduced resource consumption.
+This project showcases a basic Spring Boot application configured to build and run as a native image using GraalVM. 
+
+The application includes a `PerfController` that exposes endpoints to simulate CPU and memory-intensive operations, enabling performance profiling and monitoring through Datadog’s continuous profiling tools. 
+
+The primary goal of this project is to create a highly optimized executable, leveraging GraalVM's native image capabilities for improved startup time and reduced resource consumption.
 
 ---
 
@@ -143,6 +147,31 @@ After building, the executable can be found in the `target` directory. Run the a
 ./target/spring-native
 ```
 
+The console should display the following:
+```bash
+./target/spring-native
+
+.   ____          _            __ _ _
+/\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+\\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+'  |____| .__|_| |_|_| |_\__, | / / / /
+=========|_|==============|___/=/_/_/_/
+
+:: Spring Boot ::                (v3.4.0)
+
+2024-12-28T10:04:07.148Z  INFO 2231669 --- [spring-native] [           main] c.d.p.s.SpringNativeApplication          : Starting AOT-processed SpringNativeApplication using Java 21.0.5 with PID 2231669 (/root/spring-native/spring-native/target/spring-native started by root in /root/spring-native/spring-native)
+2024-12-28T10:04:07.148Z  INFO 2231669 --- [spring-native] [           main] c.d.p.s.SpringNativeApplication          : No active profile set, falling back to 1 default profile: "default"
+2024-12-28T10:04:07.174Z  INFO 2231669 --- [spring-native] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2024-12-28T10:04:07.176Z  INFO 2231669 --- [spring-native] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-12-28T10:04:07.176Z  INFO 2231669 --- [spring-native] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2024-12-28T10:04:07.199Z  INFO 2231669 --- [spring-native] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2024-12-28T10:04:07.199Z  INFO 2231669 --- [spring-native] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 51 ms
+2024-12-28T10:04:07.267Z  INFO 2231669 --- [spring-native] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2024-12-28T10:04:07.268Z  INFO 2231669 --- [spring-native] [           main] c.d.p.s.SpringNativeApplication          : Started SpringNativeApplication in 0.139 seconds (process running for 0.203)
+[dd.trace 2024-12-28 10:04:07:626 +0000] [dd-task-scheduler] INFO datadog.trace.agent.core.StatusLogger - DATADOG TRACER CONFIGURATION {"version":"1.44.1~13a9a2d011","os_name":"Linux","os_version":"6.8.0-1011-gcp","architecture":"amd64","lang":"jvm","lang_version":"21.0.5","jvm_vendor":"Oracle Corporation","jvm_version":"21.0.5+9-LTS","java_class_version":"65.0","http_nonProxyHosts":"null","http_proxyHost":"null","enabled":true,"service":"org.graalvm.nativeimage.builder/com.oracle.svm.hosted.NativeImageGeneratorRunner","agent_url":"http://localhost:8126","agent_error":true,"debug":false,"trace_propagation_style_extract":["datadog","tracecontext"],"trace_propagation_style_inject":["datadog","tracecontext"],"analytics_enabled":false,"priority_sampling_enabled":true,"logs_correlation_enabled":true,"profiling_enabled":true,"remote_config_enabled":true,"debugger_enabled":false,"debugger_exception_enabled":false,"debugger_span_origin_enabled":false,"appsec_enabled":"FULLY_DISABLED","rasp_enabled":true,"telemetry_enabled":false,"telemetry_dependency_collection_enabled":true,"telemetry_log_collection_enabled":false,"dd_version":"","health_checks_enabled":true,"configuration_file":"no config file present","runtime_id":"becbf736-41c7-4798-9a39-93ffb3e45267","logging_settings":{"levelInBrackets":false,"dateTimeFormat":"'[dd.trace 'yyyy-MM-dd HH:mm:ss:SSS Z']'","logFile":"System.err","configurationFile":"simplelogger.properties","showShortLogName":false,"showDateTime":true,"showLogName":true,"showThreadName":true,"defaultLogLevel":"INFO","warnLevelString":"WARN","embedException":false},"cws_enabled":false,"cws_tls_refresh":5000,"datadog_profiler_enabled":false,"datadog_profiler_safe":false,"datadog_profiler_enabled_overridden":false,"data_streams_enabled":false}
+```
+
 ### Test Endpoints
 
 Run the following `curl` commands to test the service:
@@ -264,6 +293,15 @@ Or in one pass
 
    ```bash
     DD_API_KEY=xxxxxxxx docker-compose up --build -d
+   ```
+
+You should normally see both services up and running:
+   ```bash
+docker-compose ps
+Name            Command            State                                                  Ports
+-----------------------------------------------------------------------------------------------------------------------------------------------
+dd-agent       /bin/entrypoint.sh   Up (healthy)   0.0.0.0:8125->8125/tcp,:::8125->8125/tcp, 8125/udp, 0.0.0.0:8126->8126/tcp,:::8126->8126/tcp
+springnative   ./spring-native      Up             0.0.0.0:8080->8080/tcp,:::8080->8080/tcp
    ```
 
 ### Test in Docker
